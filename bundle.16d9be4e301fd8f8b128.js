@@ -593,7 +593,7 @@ function _extends() {
 /**
  * Actions represent the type of change to a location value.
  */
-var router_Action;
+var Action;
 (function (Action) {
   /**
    * A POP indicates a change to an arbitrary index in the history stack, such
@@ -614,7 +614,7 @@ var router_Action;
    * being replaced by a new one.
    */
   Action["Replace"] = "REPLACE";
-})(router_Action || (router_Action = {}));
+})(Action || (Action = {}));
 const PopStateEventType = "popstate";
 /**
  * Memory history stores the current location in memory. It is designed for use
@@ -632,7 +632,7 @@ function router_createMemoryHistory(options) {
   let entries; // Declare so we can access from createMemoryLocation
   entries = initialEntries.map((entry, index) => createMemoryLocation(entry, typeof entry === "string" ? null : entry.state, index === 0 ? "default" : undefined));
   let index = clampIndex(initialIndex == null ? entries.length - 1 : initialIndex);
-  let action = router_Action.Pop;
+  let action = Action.Pop;
   let listener = null;
   function clampIndex(n) {
     return Math.min(Math.max(n, 0), entries.length - 1);
@@ -666,7 +666,7 @@ function router_createMemoryHistory(options) {
       return new URL(createHref(to), "http://localhost");
     },
     encodeLocation(to) {
-      let path = typeof to === "string" ? router_parsePath(to) : to;
+      let path = typeof to === "string" ? parsePath(to) : to;
       return {
         pathname: path.pathname || "",
         search: path.search || "",
@@ -674,7 +674,7 @@ function router_createMemoryHistory(options) {
       };
     },
     push(to, state) {
-      action = router_Action.Push;
+      action = Action.Push;
       let nextLocation = createMemoryLocation(to, state);
       index += 1;
       entries.splice(index, entries.length, nextLocation);
@@ -687,7 +687,7 @@ function router_createMemoryHistory(options) {
       }
     },
     replace(to, state) {
-      action = router_Action.Replace;
+      action = Action.Replace;
       let nextLocation = createMemoryLocation(to, state);
       entries[index] = nextLocation;
       if (v5Compat && listener) {
@@ -699,7 +699,7 @@ function router_createMemoryHistory(options) {
       }
     },
     go(delta) {
-      action = router_Action.Pop;
+      action = Action.Pop;
       let nextIndex = clampIndex(index + delta);
       let nextLocation = entries[nextIndex];
       index = nextIndex;
@@ -767,7 +767,7 @@ function router_createHashHistory(options) {
       pathname = "/",
       search = "",
       hash = ""
-    } = router_parsePath(window.location.hash.substr(1));
+    } = parsePath(window.location.hash.substr(1));
     // Hash URL should always have a leading / just like window.location.pathname
     // does, so if an app ends up at a route like /#something then we add a
     // leading slash so all of our path-matching behaves the same as if it would
@@ -844,7 +844,7 @@ function createLocation(current, to, state, key) {
     pathname: typeof current === "string" ? current : current.pathname,
     search: "",
     hash: ""
-  }, typeof to === "string" ? router_parsePath(to) : to, {
+  }, typeof to === "string" ? parsePath(to) : to, {
     state,
     // TODO: This could be cleaned up.  push/replace should probably just take
     // full Locations now and avoid the need to run through this flow at all
@@ -870,7 +870,7 @@ function router_createPath(_ref) {
 /**
  * Parses a string URL path into its separate pathname, search, and hash components.
  */
-function router_parsePath(path) {
+function parsePath(path) {
   let parsedPath = {};
   if (path) {
     let hashIndex = path.indexOf("#");
@@ -898,7 +898,7 @@ function getUrlBasedHistory(getLocation, createHref, validateLocation, options) 
     v5Compat = false
   } = options;
   let globalHistory = window.history;
-  let action = router_Action.Pop;
+  let action = Action.Pop;
   let listener = null;
   let index = getIndex();
   // Index should only be null when we initialize. If not, it's because the
@@ -917,7 +917,7 @@ function getUrlBasedHistory(getLocation, createHref, validateLocation, options) 
     return state.idx;
   }
   function handlePop() {
-    action = router_Action.Pop;
+    action = Action.Pop;
     let nextIndex = getIndex();
     let delta = nextIndex == null ? null : nextIndex - index;
     index = nextIndex;
@@ -930,7 +930,7 @@ function getUrlBasedHistory(getLocation, createHref, validateLocation, options) 
     }
   }
   function push(to, state) {
-    action = router_Action.Push;
+    action = Action.Push;
     let location = createLocation(history.location, to, state);
     if (validateLocation) validateLocation(location, to);
     index = getIndex() + 1;
@@ -960,7 +960,7 @@ function getUrlBasedHistory(getLocation, createHref, validateLocation, options) 
     }
   }
   function replace(to, state) {
-    action = router_Action.Replace;
+    action = Action.Replace;
     let location = createLocation(history.location, to, state);
     if (validateLocation) validateLocation(location, to);
     index = getIndex();
@@ -1078,11 +1078,11 @@ function convertRoutesToDataRoutes(routes, mapRouteProperties, parentPath, manif
  *
  * @see https://reactrouter.com/utils/match-routes
  */
-function router_matchRoutes(routes, locationArg, basename) {
+function matchRoutes(routes, locationArg, basename) {
   if (basename === void 0) {
     basename = "/";
   }
-  let location = typeof locationArg === "string" ? router_parsePath(locationArg) : locationArg;
+  let location = typeof locationArg === "string" ? parsePath(locationArg) : locationArg;
   let pathname = router_stripBasename(location.pathname || "/", basename);
   if (pathname == null) {
     return null;
@@ -1226,7 +1226,7 @@ const dynamicSegmentValue = 3;
 const indexRouteValue = 2;
 const emptySegmentValue = 1;
 const staticSegmentValue = 10;
-const splatPenalty = (/* unused pure expression or super */ null && (-2));
+const splatPenalty = -2;
 const isSplat = s => s === "*";
 function computeScore(path, index) {
   let segments = path.split("/");
@@ -1448,7 +1448,7 @@ function resolvePath(to, fromPathname) {
     pathname: toPathname,
     search = "",
     hash = ""
-  } = typeof to === "string" ? router_parsePath(to) : to;
+  } = typeof to === "string" ? parsePath(to) : to;
   let pathname = toPathname ? toPathname.startsWith("/") ? toPathname : resolvePathname(toPathname, fromPathname) : fromPathname;
   return {
     pathname,
@@ -1519,7 +1519,7 @@ function router_resolveTo(toArg, routePathnames, locationPathname, isPathRelativ
   }
   let to;
   if (typeof toArg === "string") {
-    to = router_parsePath(toArg);
+    to = parsePath(toArg);
   } else {
     to = _extends({}, toArg);
     invariant(!to.pathname || !to.pathname.includes("?"), getInvalidPathError("?", "pathname", "search", to));
@@ -1571,7 +1571,7 @@ function router_resolveTo(toArg, routePathnames, locationPathname, isPathRelativ
  */
 function getToPathname(to) {
   // Empty strings should be treated the same as / paths
-  return to === "" || to.pathname === "" ? "/" : typeof to === "string" ? router_parsePath(to).pathname : to.pathname;
+  return to === "" || to.pathname === "" ? "/" : typeof to === "string" ? parsePath(to).pathname : to.pathname;
 }
 /**
  * @private
@@ -1813,7 +1813,7 @@ class ErrorResponseImpl {
  * Check if the given error is an ErrorResponse generated from a 4xx/5xx
  * Response thrown from an action/loader
  */
-function router_isRouteErrorResponse(error) {
+function isRouteErrorResponse(error) {
   return error != null && typeof error.status === "number" && typeof error.statusText === "string" && typeof error.internal === "boolean" && "data" in error;
 }
 
@@ -1909,7 +1909,7 @@ function router_createRouter(init) {
   // Set to true if we have `hydrationData` since we assume we were SSR'd and that
   // SSR did the initial scroll restoration.
   let initialScrollRestored = init.hydrationData != null;
-  let initialMatches = router_matchRoutes(dataRoutes, init.history.location, basename);
+  let initialMatches = matchRoutes(dataRoutes, init.history.location, basename);
   let initialErrors = null;
   if (initialMatches == null) {
     // If we do not match a user-provided-route, fall back to the root
@@ -1981,7 +1981,7 @@ function router_createRouter(init) {
   };
   // -- Stateful internal variables to manage navigations --
   // Current navigation in progress (to be committed in completeNavigation)
-  let pendingAction = router_Action.Pop;
+  let pendingAction = Action.Pop;
   // Should the current navigation prevent the scroll reset if scroll cannot
   // be restored?
   let pendingPreventScrollReset = false;
@@ -2105,7 +2105,7 @@ function router_createRouter(init) {
     // resolved prior to router creation since we can't go into a fallbackElement
     // UI for SSR'd apps
     if (!state.initialized) {
-      startNavigation(router_Action.Pop, state.location, {
+      startNavigation(Action.Pop, state.location, {
         initialHydration: true
       });
     }
@@ -2214,14 +2214,14 @@ function router_createRouter(init) {
       dataRoutes = inFlightDataRoutes;
       inFlightDataRoutes = undefined;
     }
-    if (isUninterruptedRevalidation) ; else if (pendingAction === router_Action.Pop) ; else if (pendingAction === router_Action.Push) {
+    if (isUninterruptedRevalidation) ; else if (pendingAction === Action.Pop) ; else if (pendingAction === Action.Push) {
       init.history.push(location, location.state);
-    } else if (pendingAction === router_Action.Replace) {
+    } else if (pendingAction === Action.Replace) {
       init.history.replace(location, location.state);
     }
     let viewTransitionOpts;
     // On POP, enable transitions if they were enabled on the original navigation
-    if (pendingAction === router_Action.Pop) {
+    if (pendingAction === Action.Pop) {
       // Forward takes precedence so they behave like the original navigation
       let priorPaths = appliedViewTransitions.get(state.location.pathname);
       if (priorPaths && priorPaths.has(location.pathname)) {
@@ -2267,7 +2267,7 @@ function router_createRouter(init) {
       flushSync: flushSync === true
     });
     // Reset stateful navigation vars
-    pendingAction = router_Action.Pop;
+    pendingAction = Action.Pop;
     pendingPreventScrollReset = false;
     pendingViewTransitionEnabled = false;
     isUninterruptedRevalidation = false;
@@ -2297,15 +2297,15 @@ function router_createRouter(init) {
     // without having to touch history
     nextLocation = _extends({}, nextLocation, init.history.encodeLocation(nextLocation));
     let userReplace = opts && opts.replace != null ? opts.replace : undefined;
-    let historyAction = router_Action.Push;
+    let historyAction = Action.Push;
     if (userReplace === true) {
-      historyAction = router_Action.Replace;
+      historyAction = Action.Replace;
     } else if (userReplace === false) ; else if (submission != null && isMutationMethod(submission.formMethod) && submission.formAction === state.location.pathname + state.location.search) {
       // By default on submissions to the current location we REPLACE so that
       // users don't have to double-click the back button to get to the prior
       // location.  If the user redirects to a different location from the
       // action/loader this will be ignored and the redirect will be a PUSH
-      historyAction = router_Action.Replace;
+      historyAction = Action.Replace;
     }
     let preventScrollReset = opts && "preventScrollReset" in opts ? opts.preventScrollReset === true : undefined;
     let flushSync = (opts && opts.unstable_flushSync) === true;
@@ -2397,7 +2397,7 @@ function router_createRouter(init) {
     pendingViewTransitionEnabled = (opts && opts.enableViewTransition) === true;
     let routesToUse = inFlightDataRoutes || dataRoutes;
     let loadingNavigation = opts && opts.overrideNavigation;
-    let matches = router_matchRoutes(routesToUse, location, basename);
+    let matches = matchRoutes(routesToUse, location, basename);
     let flushSync = (opts && opts.flushSync) === true;
     // Short circuit with a 404 on the root error boundary if we match nothing
     if (!matches) {
@@ -2549,7 +2549,7 @@ function router_createRouter(init) {
       // back to PUSH so that the user can use the back button to get back to
       // the pre-submission form location to try again
       if ((opts && opts.replace) !== true) {
-        pendingAction = router_Action.Push;
+        pendingAction = Action.Push;
       }
       return {
         // Send back an empty object we can use to clear out any prior actionData
@@ -2726,7 +2726,7 @@ function router_createRouter(init) {
     let flushSync = (opts && opts.unstable_flushSync) === true;
     let routesToUse = inFlightDataRoutes || dataRoutes;
     let normalizedPath = normalizeTo(state.location, state.matches, basename, future.v7_prependBasename, href, future.v7_relativeSplatPath, routeId, opts == null ? void 0 : opts.relative);
-    let matches = router_matchRoutes(routesToUse, normalizedPath, basename);
+    let matches = matchRoutes(routesToUse, normalizedPath, basename);
     if (!matches) {
       setFetcherError(key, routeId, getInternalRouterError(404, {
         pathname: normalizedPath
@@ -2838,7 +2838,7 @@ function router_createRouter(init) {
     let nextLocation = state.navigation.location || state.location;
     let revalidationRequest = createClientSideRequest(init.history, nextLocation, abortController.signal);
     let routesToUse = inFlightDataRoutes || dataRoutes;
-    let matches = state.navigation.state !== "idle" ? router_matchRoutes(routesToUse, state.navigation.location, basename) : state.matches;
+    let matches = state.navigation.state !== "idle" ? matchRoutes(routesToUse, state.navigation.location, basename) : state.matches;
     invariant(matches, "Didn't find any matches after fetcher action");
     let loadId = ++incrementingLoadId;
     fetchReloadIds.set(key, loadId);
@@ -3039,7 +3039,7 @@ function router_createRouter(init) {
     // There's no need to abort on redirects, since we don't detect the
     // redirect until the action/loaders have settled
     pendingNavigationController = null;
-    let redirectHistoryAction = replace === true ? router_Action.Replace : router_Action.Push;
+    let redirectHistoryAction = replace === true ? Action.Replace : Action.Push;
     // Use the incoming submission if provided, fallback on the active one in
     // state.navigation
     let {
@@ -3438,7 +3438,7 @@ function createStaticHandler(routes, opts) {
     let url = new URL(request.url);
     let method = request.method;
     let location = createLocation("", router_createPath(url), null, "default");
-    let matches = router_matchRoutes(dataRoutes, location, basename);
+    let matches = matchRoutes(dataRoutes, location, basename);
     // SSR supports HEAD requests while SPA doesn't
     if (!isValidMethod(method) && method !== "HEAD") {
       let error = getInternalRouterError(405, {
@@ -3525,7 +3525,7 @@ function createStaticHandler(routes, opts) {
     let url = new URL(request.url);
     let method = request.method;
     let location = createLocation("", router_createPath(url), null, "default");
-    let matches = router_matchRoutes(dataRoutes, location, basename);
+    let matches = matchRoutes(dataRoutes, location, basename);
     // SSR supports HEAD requests while SPA doesn't
     if (!isValidMethod(method) && method !== "HEAD" && method !== "OPTIONS") {
       throw getInternalRouterError(405, {
@@ -3683,7 +3683,7 @@ function createStaticHandler(routes, opts) {
       });
       // action status codes take precedence over loader status codes
       return _extends({}, context, {
-        statusCode: router_isRouteErrorResponse(result.error) ? result.error.status : 500,
+        statusCode: isRouteErrorResponse(result.error) ? result.error.status : 500,
         actionData: null,
         actionHeaders: _extends({}, result.headers ? {
           [actionMatch.route.id]: result.headers
@@ -3773,7 +3773,7 @@ function createStaticHandler(routes, opts) {
  */
 function getStaticContextFromError(routes, context, error) {
   let newContext = _extends({}, context, {
-    statusCode: router_isRouteErrorResponse(error) ? error.status : 500,
+    statusCode: isRouteErrorResponse(error) ? error.status : 500,
     errors: {
       [context._deepestRenderedBoundaryId || routes[0].id]: error
     }
@@ -3941,7 +3941,7 @@ function normalizeNavigateOptions(normalizeFormMethod, isFetcher, path, opts) {
     };
   }
   // Flatten submission onto URLSearchParams for GET submissions
-  let parsedPath = router_parsePath(path);
+  let parsedPath = parsePath(path);
   // On GET navigation submissions we can drop the ?index param from the
   // resulting location since all loaders will run.  But fetcher GET submissions
   // only run a single loader so we need to preserve any incoming ?index params
@@ -4029,7 +4029,7 @@ function getMatchesToLoad(history, state, matches, submission, location, isIniti
     if (isInitialLoad || !matches.some(m => m.route.id === f.routeId) || deletedFetchers.has(key)) {
       return;
     }
-    let fetcherMatches = router_matchRoutes(routesToUse, f.path, basename);
+    let fetcherMatches = matchRoutes(routesToUse, f.path, basename);
     // If the fetcher path no longer matches, push it in with null matches so
     // we can trigger a 404 in callLoadersAndMaybeResolveData.  Note this is
     // currently only a use-case for Remix HMR where the route tree can change
@@ -4431,7 +4431,7 @@ function processRouteLoaderData(matches, matchesToLoad, results, pendingError, a
       // prevent deeper status codes from overriding
       if (!foundError) {
         foundError = true;
-        statusCode = router_isRouteErrorResponse(result.error) ? result.error.status : 500;
+        statusCode = isRouteErrorResponse(result.error) ? result.error.status : 500;
       }
       if (result.headers) {
         loaderHeaders[id] = result.headers;
@@ -4600,7 +4600,7 @@ function findRedirect(results) {
   }
 }
 function stripHashFromPath(path) {
-  let parsedPath = typeof path === "string" ? router_parsePath(path) : path;
+  let parsedPath = typeof path === "string" ? parsePath(path) : path;
   return router_createPath(_extends({}, parsedPath, {
     hash: ""
   }));
@@ -4713,7 +4713,7 @@ function hasNakedIndexQuery(search) {
   return new URLSearchParams(search).getAll("index").some(v => v === "");
 }
 function getTargetMatch(matches, location) {
-  let search = typeof location === "string" ? router_parsePath(location).search : location.search;
+  let search = typeof location === "string" ? parsePath(location).search : location.search;
   if (matches[matches.length - 1].route.index && hasNakedIndexQuery(search || "")) {
     // Return the leaf index route when index is present
     return matches[matches.length - 1];
@@ -5194,13 +5194,13 @@ function useRoutes(routes, locationArg) {
 
 // Internal implementation with accept optional param for RouterProvider usage
 function useRoutesImpl(routes, locationArg, dataRouterState, future) {
-  !useInRouterContext() ?  false ? 0 : UNSAFE_invariant(false) : void 0;
+  !useInRouterContext() ?  false ? 0 : invariant(false) : void 0;
   let {
     navigator
-  } = React.useContext(NavigationContext);
+  } = react.useContext(NavigationContext);
   let {
     matches: parentMatches
-  } = React.useContext(RouteContext);
+  } = react.useContext(RouteContext);
   let routeMatch = parentMatches[parentMatches.length - 1];
   let parentParams = routeMatch ? routeMatch.params : {};
   let parentPathname = routeMatch ? routeMatch.pathname : "/";
@@ -5212,7 +5212,7 @@ function useRoutesImpl(routes, locationArg, dataRouterState, future) {
   if (locationArg) {
     var _parsedLocationArg$pa;
     let parsedLocationArg = typeof locationArg === "string" ? parsePath(locationArg) : locationArg;
-    !(parentPathnameBase === "/" || ((_parsedLocationArg$pa = parsedLocationArg.pathname) == null ? void 0 : _parsedLocationArg$pa.startsWith(parentPathnameBase))) ?  false ? 0 : UNSAFE_invariant(false) : void 0;
+    !(parentPathnameBase === "/" || ((_parsedLocationArg$pa = parsedLocationArg.pathname) == null ? void 0 : _parsedLocationArg$pa.startsWith(parentPathnameBase))) ?  false ? 0 : invariant(false) : void 0;
     location = parsedLocationArg;
   } else {
     location = locationFromContext;
@@ -5244,10 +5244,10 @@ function useRoutesImpl(routes, locationArg, dataRouterState, future) {
   if (false) {}
   let renderedMatches = _renderMatches(matches && matches.map(match => Object.assign({}, match, {
     params: Object.assign({}, parentParams, match.params),
-    pathname: joinPaths([parentPathnameBase,
+    pathname: router_joinPaths([parentPathnameBase,
     // Re-encode pathnames that were decoded inside matchRoutes
     navigator.encodeLocation ? navigator.encodeLocation(match.pathname).pathname : match.pathname]),
-    pathnameBase: match.pathnameBase === "/" ? parentPathnameBase : joinPaths([parentPathnameBase,
+    pathnameBase: match.pathnameBase === "/" ? parentPathnameBase : router_joinPaths([parentPathnameBase,
     // Re-encode pathnames that were decoded inside matchRoutes
     navigator.encodeLocation ? navigator.encodeLocation(match.pathnameBase).pathname : match.pathnameBase])
   })), parentMatches, dataRouterState, future);
@@ -5256,7 +5256,7 @@ function useRoutesImpl(routes, locationArg, dataRouterState, future) {
   // be wrapped in a new `LocationContext.Provider` in order for `useLocation`
   // to use the scoped location instead of the global location.
   if (locationArg && renderedMatches) {
-    return /*#__PURE__*/React.createElement(LocationContext.Provider, {
+    return /*#__PURE__*/react.createElement(LocationContext.Provider, {
       value: {
         location: dist_extends({
           pathname: "/",
@@ -5286,15 +5286,15 @@ function DefaultErrorComponent() {
   };
   let devInfo = null;
   if (false) {}
-  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("h2", null, "Unexpected Application Error!"), /*#__PURE__*/React.createElement("h3", {
+  return /*#__PURE__*/react.createElement(react.Fragment, null, /*#__PURE__*/react.createElement("h2", null, "Unexpected Application Error!"), /*#__PURE__*/react.createElement("h3", {
     style: {
       fontStyle: "italic"
     }
-  }, message), stack ? /*#__PURE__*/React.createElement("pre", {
+  }, message), stack ? /*#__PURE__*/react.createElement("pre", {
     style: preStyles
   }, stack) : null, devInfo);
 }
-const defaultErrorElement = /*#__PURE__*/(/* unused pure expression or super */ null && (React.createElement(DefaultErrorComponent, null)));
+const defaultErrorElement = /*#__PURE__*/react.createElement(DefaultErrorComponent, null);
 class RenderErrorBoundary extends react.Component {
   constructor(props) {
     super(props);
@@ -5354,14 +5354,14 @@ function RenderedRoute(_ref) {
     match,
     children
   } = _ref;
-  let dataRouterContext = React.useContext(DataRouterContext);
+  let dataRouterContext = react.useContext(DataRouterContext);
 
   // Track how deep we got in our render pass to emulate SSR componentDidCatch
   // in a DataStaticRouter
   if (dataRouterContext && dataRouterContext.static && dataRouterContext.staticContext && (match.route.errorElement || match.route.ErrorBoundary)) {
     dataRouterContext.staticContext._deepestRenderedBoundaryId = match.route.id;
   }
-  return /*#__PURE__*/React.createElement(RouteContext.Provider, {
+  return /*#__PURE__*/react.createElement(RouteContext.Provider, {
     value: routeContext
   }, children);
 }
@@ -5392,7 +5392,7 @@ function _renderMatches(matches, parentMatches, dataRouterState, future) {
   let errors = (_dataRouterState2 = dataRouterState) == null ? void 0 : _dataRouterState2.errors;
   if (errors != null) {
     let errorIndex = renderedMatches.findIndex(m => m.route.id && (errors == null ? void 0 : errors[m.route.id]));
-    !(errorIndex >= 0) ?  false ? 0 : UNSAFE_invariant(false) : void 0;
+    !(errorIndex >= 0) ?  false ? 0 : invariant(false) : void 0;
     renderedMatches = renderedMatches.slice(0, Math.min(renderedMatches.length, errorIndex + 1));
   }
 
@@ -5462,13 +5462,13 @@ function _renderMatches(matches, parentMatches, dataRouterState, future) {
         // `<Route Component={...}>` in `<Routes>` but generally `Component`
         // usage is only advised in `RouterProvider` when we can convert it to
         // `element` ahead of time.
-        children = /*#__PURE__*/React.createElement(match.route.Component, null);
+        children = /*#__PURE__*/react.createElement(match.route.Component, null);
       } else if (match.route.element) {
         children = match.route.element;
       } else {
         children = outlet;
       }
-      return /*#__PURE__*/React.createElement(RenderedRoute, {
+      return /*#__PURE__*/react.createElement(RenderedRoute, {
         match: match,
         routeContext: {
           outlet,
@@ -5481,7 +5481,7 @@ function _renderMatches(matches, parentMatches, dataRouterState, future) {
     // Only wrap in an error boundary within data router usages when we have an
     // ErrorBoundary/errorElement on this route.  Otherwise let it bubble up to
     // an ancestor ErrorBoundary/errorElement
-    return dataRouterState && (match.route.ErrorBoundary || match.route.errorElement || index === 0) ? /*#__PURE__*/React.createElement(RenderErrorBoundary, {
+    return dataRouterState && (match.route.ErrorBoundary || match.route.errorElement || index === 0) ? /*#__PURE__*/react.createElement(RenderErrorBoundary, {
       location: dataRouterState.location,
       revalidation: dataRouterState.revalidation,
       component: errorElement,
@@ -5523,8 +5523,8 @@ function useDataRouterContext(hookName) {
   return ctx;
 }
 function useDataRouterState(hookName) {
-  let state = React.useContext(DataRouterStateContext);
-  !state ?  false ? 0 : UNSAFE_invariant(false) : void 0;
+  let state = react.useContext(DataRouterStateContext);
+  !state ?  false ? 0 : invariant(false) : void 0;
   return state;
 }
 function useRouteContext(hookName) {
@@ -5619,7 +5619,7 @@ function useActionData() {
  */
 function useRouteError() {
   var _state$errors;
-  let error = React.useContext(RouteErrorContext);
+  let error = react.useContext(RouteErrorContext);
   let state = useDataRouterState(DataRouterStateHook.UseRouteError);
   let routeId = useCurrentRouteId(DataRouterStateHook.UseRouteError);
 
@@ -5975,7 +5975,7 @@ function dist_Router(_ref5) {
     basename: basenameProp = "/",
     children = null,
     location: locationProp,
-    navigationType = router_Action.Pop,
+    navigationType = Action.Pop,
     navigator,
     static: staticProp = false,
     future
@@ -5994,7 +5994,7 @@ function dist_Router(_ref5) {
     }, future)
   }), [basename, future, navigator, staticProp]);
   if (typeof locationProp === "string") {
-    locationProp = router_parsePath(locationProp);
+    locationProp = parsePath(locationProp);
   }
   let {
     pathname = "/",
@@ -6182,20 +6182,20 @@ function createRoutesFromChildren(children, parentPath) {
     parentPath = [];
   }
   let routes = [];
-  React.Children.forEach(children, (element, index) => {
-    if (! /*#__PURE__*/React.isValidElement(element)) {
+  react.Children.forEach(children, (element, index) => {
+    if (! /*#__PURE__*/react.isValidElement(element)) {
       // Ignore non-elements. This allows people to more easily inline
       // conditionals in their route config.
       return;
     }
     let treePath = [...parentPath, index];
-    if (element.type === React.Fragment) {
+    if (element.type === react.Fragment) {
       // Transparently support React.Fragment and its children.
       routes.push.apply(routes, createRoutesFromChildren(element.props.children, treePath));
       return;
     }
-    !(element.type === Route) ?  false ? 0 : UNSAFE_invariant(false) : void 0;
-    !(!element.props.index || !element.props.children) ?  false ? 0 : UNSAFE_invariant(false) : void 0;
+    !(element.type === Route) ?  false ? 0 : invariant(false) : void 0;
+    !(!element.props.index || !element.props.children) ?  false ? 0 : invariant(false) : void 0;
     let route = {
       id: element.props.id || treePath.join("-"),
       caseSensitive: element.props.caseSensitive,
@@ -6886,26 +6886,26 @@ function BrowserRouter(_ref4) {
     future,
     window
   } = _ref4;
-  let historyRef = react.useRef();
+  let historyRef = React.useRef();
   if (historyRef.current == null) {
-    historyRef.current = router_createBrowserHistory({
+    historyRef.current = createBrowserHistory({
       window,
       v5Compat: true
     });
   }
   let history = historyRef.current;
-  let [state, setStateImpl] = react.useState({
+  let [state, setStateImpl] = React.useState({
     action: history.action,
     location: history.location
   });
   let {
     v7_startTransition
   } = future || {};
-  let setState = react.useCallback(newState => {
+  let setState = React.useCallback(newState => {
     v7_startTransition && dist_startTransitionImpl ? dist_startTransitionImpl(() => setStateImpl(newState)) : setStateImpl(newState);
   }, [setStateImpl, v7_startTransition]);
-  react.useLayoutEffect(() => history.listen(setState), [history, setState]);
-  return /*#__PURE__*/react.createElement(dist_Router, {
+  React.useLayoutEffect(() => history.listen(setState), [history, setState]);
+  return /*#__PURE__*/React.createElement(Router, {
     basename: basename,
     children: children,
     location: state.location,
@@ -7855,7 +7855,7 @@ var Contacts = function Contacts() {
 
 
 var App = function App() {
-  return /*#__PURE__*/react.createElement(HashRouter, null, /*#__PURE__*/react.createElement(Route, {
+  return /*#__PURE__*/react.createElement(Routes, null, /*#__PURE__*/react.createElement(Route, {
     path: "/",
     element: /*#__PURE__*/react.createElement(Layout, null)
   }, /*#__PURE__*/react.createElement(Route, {
@@ -7884,7 +7884,7 @@ var container = client.createRoot(mainEl);
 if (!root) {
   throw new Error('root not found');
 }
-container.render( /*#__PURE__*/react.createElement(BrowserRouter, null, /*#__PURE__*/react.createElement(App_App, null)));
+container.render( /*#__PURE__*/react.createElement(HashRouter, null, /*#__PURE__*/react.createElement(App_App, null)));
 }();
 /******/ })()
 ;
