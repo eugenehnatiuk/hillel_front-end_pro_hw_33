@@ -25,7 +25,7 @@
   "bugs": {
     "url": "https://github.com/eugenehnatiuk/hillel_big_fullstack_project/issues"
   },
-  "homepage": "https://github.com/eugenehnatiuk/hillel_big_fullstack_project#readme",
+  "homepage": "https://eugenehnatiuk.github.io/hillel_front-end_pro_hw_33/",
   "devDependencies": {
     "@babel/cli": "^7.23.9",
     "@babel/core": "^7.23.9",

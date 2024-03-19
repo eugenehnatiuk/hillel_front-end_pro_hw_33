@@ -15,6 +15,7 @@ const App = () => {
         <Route path="/questions" element={<FAQ />} />
         <Route path="/content" element={<Content />} />
         <Route path="/contacts" element={<Contacts />} />
+        <Route path="*" element={'404 - Not Found'} />
       </Route>
     </Routes>
   );

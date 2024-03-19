@@ -7,7 +7,7 @@ import App from './components/App/App';
 const mainEl = document.getElementById('root');
 const container = ReactDOM.createRoot(mainEl);
 
-if (!root) {
+if (!mainEl) {
   throw new Error('root not found');
 }
 
