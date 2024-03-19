@@ -1,8 +1,8 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-const webpack = require('webpack');
 const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = (env) => {
@@ -24,24 +24,23 @@ module.exports = (env) => {
       },
       historyApiFallback: true,
     },
-    devtool: isDev ? 'inline-source-map' : false,
+    devtool: isDev && 'inline-source-map',
     // devtool: 'inline-source-map',
     plugins: [
       new HtmlWebpackPlugin({
         template: path.resolve(__dirname, 'src', 'index.html'),
-        favicon: path.resolve(__dirname, 'src', 'images', 'favicon-32x32.png'),
+        // favicon: path.resolve(__dirname, 'src', 'images', 'favicon-32x32.png'),
       }),
       new MiniCssExtractPlugin({ filename: 'style.[contenthash].css' }),
 
-      isDev ? new webpack.ProgressPlugin() : undefined,
-      // to see the building progression
+      isDev && new webpack.ProgressPlugin(), // to see the building progression
       new CopyPlugin({
         patterns: [
           { from: 'src/images', to: 'images' }, // Копіює файли з src/images у папку build/static/images
           { from: 'src/fonts', to: 'fonts' },
         ],
       }),
-    ],
+    ].filter(Boolean),
     optimization: {
       minimizer: [
         new CssMinimizerPlugin({
@@ -67,30 +66,32 @@ module.exports = (env) => {
         {
           test: /\.jsx?$/,
           exclude: /node_modules/,
-          use: !isDev
-            ? {
-                loader: 'babel-loader',
-                options: {
-                  presets: [
-                    [
-                      '@babel/preset-env',
-                      {
-                        targets: {
-                          edge: '17',
-                          firefox: '60',
-                          chrome: '67',
-                          safari: '11.1',
-                          ie: '11',
-                        },
-                      },
-                    ],
-                    '@babel/preset-react',
-                  ],
-                },
-              }
-            : [], // undefined
+
+          use: {
+            loader: 'babel-loader',
+            options: {
+              presets: [
+                [
+                  '@babel/preset-env',
+                  {
+                    targets: {
+                      edge: '17',
+                      firefox: '60',
+                      chrome: '67',
+                      safari: '11.1',
+                      ie: '11',
+                    },
+                  },
+                ],
+                '@babel/preset-react',
+              ],
+            },
+          },
         },
       ],
+    },
+    resolve: {
+      extensions: ['.js', '.jsx'],
     },
   };
 };

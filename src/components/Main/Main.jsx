@@ -1,6 +1,6 @@
 import React from 'react';
 import './main.scss';
-import Description from './Discription/Description.jsx';
+import Description from './Discription/Description';
 
 const Main = () => {
   return <Description />;

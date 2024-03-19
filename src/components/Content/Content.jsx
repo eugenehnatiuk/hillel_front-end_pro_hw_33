@@ -2,7 +2,7 @@ import React from 'react';
 
 const Content = () => {
   return (
-    <div className="main-section__content">
+    <div className="main-section__content container">
       <h2>Lorem Ipsum</h2>
       <h3>What is Lorem Ipsum?</h3>
       <p className="main-section__content-text">

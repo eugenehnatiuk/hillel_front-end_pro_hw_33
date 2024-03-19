@@ -1,7 +1,7 @@
 import React from 'react';
 import './header.scss';
-import MenuItem from './MenuItems/Menuitem.jsx';
-import Logo from './Logo/Logo.jsx';
+import MenuItem from './MenuItems/Menuitem';
+import Logo from './Logo/Logo';
 
 const menuProps = [
   ['Main', 'header__navmenu-item', '/'],
@@ -13,7 +13,7 @@ const menuProps = [
 const Header = () => {
   return (
     <div className="wrapper">
-      <header className="header container">
+      <header className="header ">
         <Logo />
         <nav className="header__navmenu ">
           <ul className="header__navmenu-list ">

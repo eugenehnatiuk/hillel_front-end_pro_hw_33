@@ -12,20 +12,20 @@
 
   @include viewport-md {
     // від 768 >
-    // max-width: 708px;
+    max-width: 708px;
   }
 
   @include viewport-lg {
     // від 1024 >
-    // max-width: 964px;
+    max-width: 964px;
   }
 
   // @include viewport-xl {
   //   // від 1440 >
-  //   max-width: 1380px;
+    max-width: 1380px;
   // }
 
   // @include viewport-xll {
-  //   max-width: 1760px;
+    max-width: 1760px;
   // }
 }

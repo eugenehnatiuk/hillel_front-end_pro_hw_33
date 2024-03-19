@@ -8,7 +8,7 @@
     "sass:watch": "sass --watch src/style/style.scss:src/style/style.css",
     "watch:client": "webpack --watch",
     "watch:server": "nodemon server/index.mjs",
-    "serve": "webpack serve",
+    "serve": "webpack serve --env mode=development",
     "build": "webpack",
     "build:prod": "webpack -- --env mode=production",
     "start": "npm-run-all --parallel watch:client watch:server"
