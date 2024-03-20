@@ -10,7 +10,7 @@ import Content from '../Content/Content';
 import Contacts from '../Contacts/Contacts';
 
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: '/',
     element: <Layout />,
