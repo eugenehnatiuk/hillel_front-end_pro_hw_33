@@ -1,5 +1,8 @@
 import React from 'react';
-import { Route, Routes } from 'react-router-dom';
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from 'react-router-dom';
 import Layout from './Layout';
 import Main from '../Main/Main';
 import FAQ from '../FAQ/FAQ';
@@ -7,19 +10,39 @@ import Content from '../Content/Content';
 import Contacts from '../Contacts/Contacts';
 
 
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Layout />,
+    children: [
+      {
+        index: true,
+        element: <Main />,
+      },
+      {
+        path: '/questions',
+        element: <FAQ />,
+      },
+      {
+        path: '/content',
+        element: <Content />,
+      },
+      {
+        path: '/contacts',
+        element: <Contacts />,
+      },
+      {
+        path: '*',
+        element: '404 - Not Found',
+      },
+    ],
+  },
+]);
+
 const App = () => {
   return (
-    <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Main />} />
-        <Route path="/questions" element={<FAQ />} />
-        <Route path="/content" element={<Content />} />
-        <Route path="/contacts" element={<Contacts />} />
-        <Route path="*" element={'404 - Not Found'} />
-      </Route>
-    </Routes>
+     <RouterProvider router={router} />
   );
 };
 
 export default App;
-

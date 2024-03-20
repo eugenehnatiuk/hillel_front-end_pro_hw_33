@@ -37,7 +37,7 @@ module.exports = (env) => {
       new CopyPlugin({
         patterns: [
           { from: 'src/images', to: 'images' }, // Копіює файли з src/images у папку build/static/images
-          { from: 'src/fonts', to: 'fonts' },
+          // { from: 'src/fonts', to: 'fonts' },
         ],
       }),
     ].filter(Boolean),
@@ -88,6 +88,19 @@ module.exports = (env) => {
             },
           },
         },
+        // {
+        //   test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+        //   type: 'javascript/auto',
+        //   use: [
+        //     {
+        //       loader: 'file-loader',
+        //       options: {
+        //         name: '[name].[ext]',
+        //         outputPath: 'fonts/',
+        //       },
+        //     },
+        //   ],
+        // },
       ],
     },
     resolve: {
