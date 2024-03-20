@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   createBrowserRouter,
+  createHashRouter,
   RouterProvider,
 } from 'react-router-dom';
 import Layout from './Layout';
