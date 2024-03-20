@@ -31,7 +31,10 @@ module.exports = (env) => {
         template: path.resolve(__dirname, 'src', 'index.html'),
         // favicon: path.resolve(__dirname, 'src', 'images', 'favicon-32x32.png'),
       }),
-      new MiniCssExtractPlugin({ filename: 'style.[contenthash].css' }),
+      new MiniCssExtractPlugin({
+        filename: 'style/style.[contenthash].css',
+        chunkFilename: 'style/style.[contenthash].css',
+      }),
 
       isDev && new webpack.ProgressPlugin(), // to see the building progression
       new CopyPlugin({

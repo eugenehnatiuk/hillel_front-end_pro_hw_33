@@ -1,15 +1,25 @@
-import React from 'react';
+import React, { lazy } from 'react';
 import {
   createBrowserRouter,
   createHashRouter,
   RouterProvider,
 } from 'react-router-dom';
+
 import Layout from './Layout';
 import Main from '../Main/Main';
-import FAQ from '../FAQ/FAQ';
-import Content from '../Content/Content';
-import Contacts from '../Contacts/Contacts';
+// import FAQ from '../FAQ/FAQ';
+// import Content from '../Content/Content';
+// import Contacts from '../Contacts/Contacts';
 
+function delayForDemo(promise) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, 2000);
+  }).then(() => promise);
+}
+
+const FAQ = lazy(() => delayForDemo(import('../FAQ/FAQ')));
+const Content = lazy(() => delayForDemo(import('../Content/Content')));
+const Contacts = lazy(() => delayForDemo(import('../Contacts/Contacts')));
 
 const router = createHashRouter([
   {
@@ -41,9 +51,7 @@ const router = createHashRouter([
 ]);
 
 const App = () => {
-  return (
-     <RouterProvider router={router} />
-  );
+  return <RouterProvider router={router} />;
 };
 
 export default App;
